@@ -1,0 +1,21 @@
+---
+title: "EnsembleLacs"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{EnsembleLacs}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(EnsembleLacs)
+```
+
+##Run after the edit is finished: usethis::use_vignette("my-vignette")

@@ -1,0 +1,26 @@
+{
+    "id": "6751C387",
+    "path": "~/UniLeon/projetos/EnsembleLacs/R/ResInd.R",
+    "project_path": "R/ResInd.R",
+    "type": "r_source",
+    "hash": "3551079075",
+    "contents": "",
+    "dirty": false,
+    "created": 1740052010589.0,
+    "source_on_save": false,
+    "relative_order": 12,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "11,36",
+        "scrollLine": "3"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1740060356,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1740060356165,
+    "read_only": false,
+    "read_only_alternatives": []
+}
