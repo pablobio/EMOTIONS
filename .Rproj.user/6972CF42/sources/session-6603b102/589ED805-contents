@@ -7,6 +7,7 @@
 #' @param dim  The name of the column containing days in milk records
 #' @param alpha A penalization factor, ranging from 0 to 1, for the estimation of the model`s weight
 #' @param models A vector describing the models to be included in the analysis. In total, 47 models are included in EmsembleLacs. The default option is "All", which results in the inclusion of the 47 models. Alternatively, a vector containing any subset of the following models can be provided: "MMR","MME","brody23","brody24", "SCH","SCHL","PBE","wood","DHA", "CB","QP","CLD","PapBo1","PapBo2", "PapBo3", "PapBo4", "PapBo6", "GS1",  "GS2","LQ", "wil", "wilk", "wilycsml", "BC", "DJK","MG2", "MG4", "MG", "KHN", "AS", "FRP","PTmult","PTmod", "MonoG", "MonoGpw", "DiG", "DiGpw","legpol3", "legpol4", "legpolWil", "cubsplin3", "cubsplin4", "cubsplin5", "cubsplindef", "wilminkPop", "qntReg", "Legpol4Poppe"
+#' @param param_list A list composed by the models, named as in the models parameter, and the repective parameters included in the models.
 #' @importFrom stats predict AIC var sd acf as.formula dgamma lm median nls
 #' @importFrom orthopolynom polynomial.values
 #' @importFrom orthopolynom legendre.polynomials
@@ -15,7 +16,7 @@
 #' @importFrom quantreg rq
 #' @importFrom minpack.lm nlsLM
 #' @return A list containing the fitted models, the model`s weigths and ranks, and the predicted daily production obtained through the model ensemble
-ModelsLac<-function(data,ID_col,ID,trait,dim, alpha,models){
+ModelsLac<-function(data,ID_col,ID,trait,dim, alpha,models,param_list=NULL){
 
   x<-data
 
@@ -25,156 +26,168 @@ ModelsLac<-function(data,ID_col,ID,trait,dim, alpha,models){
     production = list()
   )
 
+
+  if(is.null(param_list)){
+  list_par<-ParDef(x,trait)
+  }else{
+
+    list_par<-ParDef(x,trait)
+
+    list_par[names(param_list)]<-param_list
+
+  }
+
+
   #(1) Michaelis-Menten
-  MM = try(nls(as.formula(paste0(trait, " ~ (a", " * ", dim, ") / (b", " + ", dim, ")")), data = x, na.action = na.exclude, start = list(a = 19.8, b = -1.65), control = list(maxiter = 100,warnOnly = TRUE)), silent = TRUE)
+  MM = try(nls(as.formula(paste0(trait, " ~ (a", " * ", dim, ") / (b", " + ", dim, ")")), data = x, na.action = na.exclude, start = list(a = par_list$MM["a"], b = par_list$MM["b"]), control = list(maxiter = 100,warnOnly = TRUE)), silent = TRUE)
 
 
   #(1a) Michaelis-Menten (Rook)
-  MMR = try(nls(as.formula(paste0(trait, "~",1, "/(",1,"+ a", "/(b","+",dim,"))")), data = x, na.action = na.exclude, start = list(a = -10, b = -1.4), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  MMR = try(nls(as.formula(paste0(trait, "~",1, "/(",1,"+ a", "/(b","+",dim,"))")), data = x, na.action = na.exclude, start = list(a = par_list$MMR["a"], b = par_list$MMR["b"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   # #(1b) Michaelis-Menten + Exponential (Rook)
-  MME = try(nls(as.formula(paste0(trait, "~","a*(",1,"/(",1,"+b","/(c","+", dim,")))", "*","exp(-d*",dim,")")), data = x, na.action = na.exclude, start = list(a = -0.06608, b = 317.49, c = -328.06, d = -0.027), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  MME = try(nls(as.formula(paste0(trait, "~","a*(",1,"/(",1,"+b","/(c","+", dim,")))", "*","exp(-d*",dim,")")), data = x, na.action = na.exclude, start = list(a = par_list$MME["a"], b = par_list$MME["b"], c = par_list$MME["c"], d = par_list$MME["d"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   #(2) Brody 1923
-  brody23 = try(nls(as.formula(paste0(trait, "~","a*exp(-b*",dim,")")), data = x, na.action = na.exclude, start = list(a = 25.6, b = 0.0015), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  brody23 = try(nls(as.formula(paste0(trait, "~","a*exp(-b*",dim,")")), data = x, na.action = na.exclude, start = list(a = par_list$brody23["a"], b = par_list$brody23["b"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   # #(3) Brody 1924
-  brody24 = try(nls(as.formula(paste0(trait, "~","a*exp(-b*",dim,")-","a*exp(-c*",dim,")")), data = x, na.action = na.exclude, start = list(a = 26.127, b = 0.0017, c = 0.2575), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  brody24 = try(nls(as.formula(paste0(trait, "~","a*exp(-b*",dim,")-","a*exp(-c*",dim,")")), data = x, na.action = na.exclude, start = list(a = par_list$brody24["a"], b = par_list$brody24["b"], c = par_list$brody24["c"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   #(4) Schumacher
-  SCH = try(nls(as.formula(paste0(trait, "~","exp(a+b/",dim,")")), data = x, na.action = na.exclude, start = list(a = 1, b = 16), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  SCH = try(nls(as.formula(paste0(trait, "~","exp(a+b/",dim,")")), data = x, na.action = na.exclude, start = list(a = par_list$SCH["a"], b = par_list$SCH["b"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   #(4a) Schumacher (Lopez)
-  SCHL = try(nls(as.formula(paste0(trait, "~","a*exp(b*",dim,"/(",dim,"+",1,"))")), data = x, na.action = na.exclude, start = list(a = min(x[,trait]), b = -2.6), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  SCHL = try(nls(as.formula(paste0(trait, "~","a*exp(b*",dim,"/(",dim,"+",1,"))")), data = x, na.action = na.exclude, start = list(a = par_list$SCHL["a"], b = par_list$SCHL["b"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   #(5) Parabolic Exponential (Sikka, Adediran)
-  PBE = try(nls(as.formula(paste0(trait, "~","a*exp((b*",dim,")-(c*",dim,"^2","))")), data = x, na.action = na.exclude, start = list(a = 25, b = -8e-04, c = 2e-06), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  PBE = try(nls(as.formula(paste0(trait, "~","a*exp((b*",dim,")-(c*",dim,"^2","))")), data = x, na.action = na.exclude, start = list(a = par_list$PBE["a"], b = par_list$PBE["b"], c = par_list$PBE["c"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   #(6) Wood
-  wood = try(nls(as.formula(paste0(trait, "~","a*",dim,"^b*exp(-c*",dim,")")), data = x, na.action = na.exclude, start = list(a = median(x[,trait]), b = log(max(x[,trait]) / median(x[,trait])) / max(x[,dim]), c = 0.05), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  wood = try(nls(as.formula(paste0(trait, "~","a*",dim,"^b*exp(-c*",dim,")")), data = x, na.action = na.exclude, start = list(a = par_list$wood["a"], b = par_list$wood["b"], c = par_list$wood["c"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   #(6a) Wood (Dhanoa)
-  DHA = try(nls(as.formula(paste0(trait, "~","a*(",dim,"^(b*c))*exp(-c*",dim,")")), data = x, na.action = na.exclude, start = list(a = median(x[,trait]), b = log(max(x[,trait]) / median(x[,trait])) / max(x[,dim]), c = 0.05), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  DHA = try(nls(as.formula(paste0(trait, "~","a*(",dim,"^(b*c))*exp(-c*",dim,")")), data = x, na.action = na.exclude, start = list(a = par_list$DHA["a"], b = par_list$DHA["b"], c = par_list$DHA["c"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   #(6b) Wood (Cappio-Borlino)
-  CB = try(nls(as.formula(paste0(trait, "~","a*(",dim,"^b)*exp(-c*",dim,")")), data = x, na.action = na.exclude, start = list(a = min(x[,trait]), b = 0.07, c = 0.002), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  CB = try(nls(as.formula(paste0(trait, "~","a*(",dim,"^b)*exp(-c*",dim,")")), data = x, na.action = na.exclude, start = list(a = par_list$CB["a"], b = par_list$CB["b"], c = par_list$CB["c"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   #(7) Quadratic Polynomial (Dave)
-  QP = try(nls(as.formula(paste0(trait, "~","a+b*",dim,"+c*",dim,"^2")), data = x, na.action = na.exclude, start = list(a = 25, b = -0.02, c = -1.5e-05), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  QP = try(nls(as.formula(paste0(trait, "~","a+b*",dim,"+c*",dim,"^2")), data = x, na.action = na.exclude, start = list(a = par_list$QP["a"], b = par_list$QP["b"], c = par_list$QP["c"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   #(8) Cobby & Le Du
-  CLD = try(nls(as.formula(paste0(trait, "~","a-b*",dim,"-a*exp(-c*",dim,")")), data = x, na.action = na.exclude, start = list(a = 25, b = 0.03, c = 0.28), control = list(maxiter = 100,minFactor = 1e-6,  warnOnly = TRUE)), silent = TRUE)
+  CLD = try(nls(as.formula(paste0(trait, "~","a-b*",dim,"-a*exp(-c*",dim,")")), data = x, na.action = na.exclude, start = list(a = par_list$CLD["a"], b = par_list$CLD["b"], c = par_list$CLD["c"]), control = list(maxiter = 100,minFactor = 1e-6,  warnOnly = TRUE)), silent = TRUE)
 
 
   #(9) Papajcsik and Bodero 1
-  PapBo1 = try(nls(as.formula(paste0(trait, "~","a*",dim,"^b/cosh(c*",dim,")")), data = x, na.action = na.exclude, start = list(a = min(x[,trait]), b = -0.0098, c = 0.0033), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  PapBo1 = try(nls(as.formula(paste0(trait, "~","a*",dim,"^b/cosh(c*",dim,")")), data = x, na.action = na.exclude, start = list(a = par_list$PapBo1["a"], b = par_list$PapBo1["b"], c = par_list$PapBo1["c"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   #(10) Papajcsik and Bodero 2
-  PapBo2 = try(nls(as.formula(paste0(trait, "~","a*(1-exp(-b*",dim,"))/cosh(c*",dim,")")), data = x, na.action = na.exclude, start = list(a = 23.896, b = 0.398, c = 0.0034), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  PapBo2 = try(nls(as.formula(paste0(trait, "~","a*(1-exp(-b*",dim,"))/cosh(c*",dim,")")), data = x, na.action = na.exclude, start = list(a = par_list$PapBo2["a"], b = par_list$PapBo2["b"], c = par_list$PapBo2["c"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   #(11) Papajcsik and Bodero 3
-  PapBo3 = try(nls(as.formula(paste0(trait, "~","a*atan(b*", dim,")/cosh(c*",dim,")")), data = x, na.action = na.exclude, start = list(a = 15.27, b = 2.587, c = 0.00346), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  PapBo3 = try(nls(as.formula(paste0(trait, "~","a*atan(b*", dim,")/cosh(c*",dim,")")), data = x, na.action = na.exclude, start = list(a = par_list$PapBo3["a"], b = par_list$PapBo3["b"], c = par_list$PapBo3["c"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   #(12) Papajcsik and Bodero 4
-  PapBo4 = try(nls(as.formula(paste0(trait, "~","a*log(b*", dim, ")*exp(-c*",dim,")")), data = x, na.action = na.exclude, start = list(a = 1.763, b = 76690, c = 0.00219), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  PapBo4 = try(nls(as.formula(paste0(trait, "~","a*log(b*", dim, ")*exp(-c*",dim,")")), data = x, na.action = na.exclude, start = list(a = par_list$PapBo4["a"], b = par_list$PapBo4["b"], c = par_list$PapBo4["c"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   #(13) Papajcsik and Bodero 6
-  PapBo6 = try(nls(as.formula(paste0(trait, "~","a*atan(b*",dim,")*exp(-c*", dim, ")")), data = x, na.action = na.exclude, start = list(a = 17.25, b = 0.493, c = 0.0018), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  PapBo6 = try(nls(as.formula(paste0(trait, "~","a*atan(b*",dim,")*exp(-c*", dim, ")")), data = x, na.action = na.exclude, start = list(a = par_list$PapBo6["a"], b = par_list$PapBo6["b"], c = par_list$PapBo6["c"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   #(14) Mixed log model 1 (Guo & Swalve)
-  GS1 = try(nls(as.formula(paste0(trait, "~","a+b*",dim,"^0.5+c*log(", dim,")")), data = x, na.action = na.exclude, start = list(a = 18.28, b = -1.58, c = 4.33), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  GS1 = try(nls(as.formula(paste0(trait, "~","a+b*",dim,"^0.5+c*log(", dim,")")), data = x, na.action = na.exclude, start = list(a = par_list$GS1["a"], b = par_list$GS1["b"], c = par_list$GS1["c"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   #(15) Mixed log model 3 (Guo & Swalve)
-  GS2 = try(nls(as.formula(paste0(trait, "~","a+b*",dim,"^0.5+c*log(", dim,")+d*", dim, "^4")), data = x, na.action = na.exclude, start = list(a = 17.75, b = -1.72, c = 4.81, d = 7e-11), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  GS2 = try(nls(as.formula(paste0(trait, "~","a+b*",dim,"^0.5+c*log(", dim,")+d*", dim, "^4")), data = x, na.action = na.exclude, start = list(a = par_list$GS2["a"], b = par_list$GS2["b"], c = par_list$GS2["c"], d = par_list$GS2["d"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   # #(16) Log-quadratic (Adediran)
-  LQ = try(nls(as.formula(paste0(trait, "~","exp(a*(b-log(", dim, "))^2+c)")), data = x, na.action = na.exclude, start = list(a = min(x[,trait]), b = (max(x[,trait], na.rm = TRUE) - min(x[,trait], na.rm = TRUE)) / max(x[,dim], na.rm = TRUE), c = (max(x[,trait], na.rm = TRUE) - min(x[,trait], na.rm = TRUE)) / 2), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  LQ = try(nls(as.formula(paste0(trait, "~","exp(a*(b-log(", dim, "))^2+c)")), data = x, na.action = na.exclude, start = list(a = par_list$LQ["a"], b = par_list$LQ["b"], c = par_list$LQ["c"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   #(17) Wilmink
-  wil = try(nls(as.formula(paste0(trait, "~","a+b*exp(-k*",dim,")+c*",dim)), data = x, na.action = na.exclude, start = list(a = 25, b = -7, c = -0.03, k = 0.1), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  wil = try(nls(as.formula(paste0(trait, "~","a+b*exp(-k*",dim,")+c*",dim)), data = x, na.action = na.exclude, start = list(a = par_list$wil["a"], b = par_list$wil["b"], c = par_list$wil["c"], k = par_list$wil["k"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   #(17a) Wilmink (Kheidirabadi)
-  wilk = try(nls(as.formula(paste0(trait, "~","a+b*exp(-k*",dim,")+c*(",dim,"/100)")), data = x, na.action = na.exclude, start = list(a = 25, b = -7, c = -3, k = 0.1), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  wilk = try(nls(as.formula(paste0(trait, "~","a+b*exp(-k*",dim,")+c*(",dim,"/100)")), data = x, na.action = na.exclude, start = list(a = par_list$wilk["a"], b = par_list$wilk["b"], c = par_list$wilk["c"], k = par_list$wilk["k"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   #(17b) Wilmink (Laurenson & Strucken)
-  wilycsml = try(nls(as.formula(paste0(trait, "~","a+(b-a)*(1-exp(-k*",dim,"))-c*",dim)), data = x, na.action = na.exclude, start = list(a = 20, b = 30, c = 0.005, k = 0.08), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  wilycsml = try(nls(as.formula(paste0(trait, "~","a+(b-a)*(1-exp(-k*",dim,"))-c*",dim)), data = x, na.action = na.exclude, start = list(a = par_list$wilycsml["a"], b = par_list$wilycsml["b"], c = par_list$wilycsml["c"], k = par_list$wilycsml["k"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   #(18) Bicompartemental (Ferguson & Boston)
-  BC = try(nls(as.formula(paste0(trait, "~","a*exp(-b*", dim,")+c*exp(-d*",dim,")")), data = x, na.action = na.exclude, start = list(a = min(x[,trait], na.rm = TRUE), b =0.0017, c = -7.68, d = 0.08), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  BC = try(nls(as.formula(paste0(trait, "~","a*exp(-b*", dim,")+c*exp(-d*",dim,")")), data = x, na.action = na.exclude, start = list(a = par_list$BC["a"], b =par_list$BC["b"], c = par_list$BC["c"], d = par_list$BC["d"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   #(19) Dijkstra
-  DJK = try(nls(as.formula(paste0(trait, "~","a*exp(b*(1-exp(-c*",dim,"))/c-(d*",dim,"))" )), data = x, na.action = na.exclude, start = list(a = 19, b = 0.027, c = 0.08, d = 0.0017), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  DJK = try(nls(as.formula(paste0(trait, "~","a*exp(b*(1-exp(-c*",dim,"))/c-(d*",dim,"))" )), data = x, na.action = na.exclude, start = list(a = par_list$DJK["a"], b = par_list$DJK["b"], c = par_list$DJK["c"], d = par_list$DJK["d"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   #(20) Morant & Gnanasakthy (Pollott)
-  MG2 = try(nls(as.formula(paste0(trait, "~","exp(a+b*((",dim,"-","150)/100)+c*((",dim,"-150)/100)^2+d/",dim,")")), data = x, na.action = na.exclude, start = list(a = 3, b = -0.18, c = 0.002, d = -1.4), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  MG2 = try(nls(as.formula(paste0(trait, "~","exp(a+b*((",dim,"-","150)/100)+c*((",dim,"-150)/100)^2+d/",dim,")")), data = x, na.action = na.exclude, start = list(a = par_list$MG2["a"], b = par_list$MG2["b"], c = par_list$MG2["c"], d = par_list$MG2["d"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   #(21) Morant & Gnanasakthy (Vargas)
-  MG4 = try(nls(as.formula(paste0(trait, "~","a*exp(b*((",dim,"-150)/100)/2+c/",dim,"-d*(1+((",dim,"-21.4)/100)/2)*((",dim,"-21.4)/100))")), data = x, na.action = na.exclude, start = list(a = 20.5, b = -0.38, c = -1.45, d = -0.005), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  MG4 = try(nls(as.formula(paste0(trait, "~","a*exp(b*((",dim,"-150)/100)/2+c/",dim,"-d*(1+((",dim,"-21.4)/100)/2)*((",dim,"-21.4)/100))")), data = x, na.action = na.exclude, start = list(a = par_list$MG4["a"], b = par_list$MG2["b"], c = par_list$MG2["c"], d = par_list$MG2["d"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   #(22) Morant & Gnanasakthy (Adediran)
-  MG = try(nls(as.formula(paste0(trait, "~","exp(a-b*((",dim,"-150)/100)+c*((",dim,"-150)/100)^2+d/",dim,")")), data = x, na.action = na.exclude, start = list(a = 3, b = 0.18, c = 0.002, d = -1.4), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  MG = try(nls(as.formula(paste0(trait, "~","exp(a-b*((",dim,"-150)/100)+c*((",dim,"-150)/100)^2+d/",dim,")")), data = x, na.action = na.exclude, start = list(a = par_list$MG["a"], b = par_list$MG["b"], c = par_list$MG["c"], d = par_list$MG["d"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   #(23) Khandekar (Guo & Swalve)
-  KHN = try(nls(as.formula(paste0(trait, "~","a+b*",dim,"+c*",dim,"^2+d*",dim,"^3+f*log(",dim,")")), data = x, na.action = na.exclude, start = list(a = 15, b = -0.15, c = 0.00043, d = 5e-07, f = 4.05), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  KHN = try(nls(as.formula(paste0(trait, "~","a+b*",dim,"+c*",dim,"^2+d*",dim,"^3+f*log(",dim,")")), data = x, na.action = na.exclude, start = list(a = par_list$KHN["a"], b = par_list$KHN["b"], c = par_list$KHN["c"], d = par_list$KHN["d"], f = par_list$KHN["f"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   #(24) Ali & Schaeffer
-  AS = try(nls(as.formula(paste0(trait, "~","a+b*(",dim,"/340)+c*(",dim,"^2/340)+d*log(340/",dim,")+f*log(340/",dim,")^2")), data = x, na.action = na.exclude, start = list(a = 19, b = -5, c = 0.003, d = 5.3, f = -1.1), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  AS = try(nls(as.formula(paste0(trait, "~","a+b*(",dim,"/340)+c*(",dim,"^2/340)+d*log(340/",dim,")+f*log(340/",dim,")^2")), data = x, na.action = na.exclude, start = list(a = par_list$AS["a"], b = par_list$AS["b"], c = par_list$AS["c"], d = par_list$AS["d"], f = par_list$AS["f"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   #(25) Fractional Polynomial (Elvira)
-  FRP = try(nls(as.formula(paste0(trait, "~","a+b*",dim,"+c*log(",dim,")+d*",dim,"^0.5+f*",dim,"^2")), data = x, na.action = na.exclude, start = list(a = 15, b = -0.08, c = 8, d = -3, f = -4e-05), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  FRP = try(nls(as.formula(paste0(trait, "~","a+b*",dim,"+c*log(",dim,")+d*",dim,"^0.5+f*",dim,"^2")), data = x, na.action = na.exclude, start = list(a = par_list$FRP["a"], b = par_list$FRP["b"], c = par_list$FRP["c"], d = par_list$FRP["d"], f = par_list$FRP["f"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   #(26) Pollott multiplicative reduced (Elvira)
-  PTmult = try(nls(as.formula(paste0(trait, "~","a/(1+((1 - 0.999999)/0.999999) *exp(-0.1 *",dim,"))*(2-exp(-b*",dim,"))")), data = x, na.action = na.exclude, start = list(a = 25, b = -0.001), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  PTmult = try(nls(as.formula(paste0(trait, "~","a/(1+((1 - 0.999999)/0.999999) *exp(-0.1 *",dim,"))*(2-exp(-b*",dim,"))")), data = x, na.action = na.exclude, start = list(a = par_list$PTmult["a"], b = par_list$PTmult["b"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   #(27) Pollott modified (Adediran)
-  PTmod = try(nls(as.formula(paste0(trait, "~","a/((1+b*(exp(-c*",dim,")))) * (2 -exp(-d*",dim,"))")), data = x, na.action = na.exclude, start = list(a = min(x[,trait],na.rm = TRUE), b = (max(x[,trait], na.rm = TRUE) - min(x[,trait], na.rm = TRUE)) / max(x[,dim], na.rm = TRUE), c = 0.13, d = -0.001), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  PTmod = try(nls(as.formula(paste0(trait, "~","a/((1+b*(exp(-c*",dim,")))) * (2 -exp(-d*",dim,"))")), data = x, na.action = na.exclude, start = list(a = par_list$PTmod["a"], b = par_list$PTmod["b"], c = par_list$PTmod["c"], d = par_list$PTmod["d"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   #(28) Monophasic Grossman
-  MonoG = try(nls(as.formula(paste0(trait, "~","a*b*(1-tanh(b*(",dim,"-c)))")), data = x, na.action = na.exclude, start = list(a = 7703, b = 0.002, c = 277), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  MonoG = try(nls(as.formula(paste0(trait, "~","a*b*(1-tanh(b*(",dim,"-c)))")), data = x, na.action = na.exclude, start = list(a = par_list$MonoG["a"], b = par_list$MonoG["b"], c = par_list$MonoG["c"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   #(29) Monophasic Grossman power
-  MonoGpw = try(nls(as.formula(paste0(trait, "~","a*(1 - tanh(b*(",dim,"^k-c))^2)")), data = x, na.action = na.exclude, start = list(a = 24.5707, b = 0.6292, c = 1.9977, k = 0.1978), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  MonoGpw = try(nls(as.formula(paste0(trait, "~","a*(1 - tanh(b*(",dim,"^k-c))^2)")), data = x, na.action = na.exclude, start = list(a = par_list$MonoGpw["a"], b = par_list$MonoGpw["b"], c = par_list$MonoGpw["c"], k = par_list$MonoGpw["k"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   #(30) Diphasic Grossman
-  DiG = try(nls(as.formula(paste0(trait, "~","a*b*(1 - tanh(b*(",dim,"-c))^2) +d*f*(1 - tanh(f*(",dim,"-g))^2)")), data = x, na.action = na.exclude, start = list(a = 353.8, b = 0.016, c = 36.3, d = 7371, f = 0.003, g = 113.5), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  DiG = try(nls(as.formula(paste0(trait, "~","a*b*(1 - tanh(b*(",dim,"-c))^2) +d*f*(1 - tanh(f*(",dim,"-g))^2)")), data = x, na.action = na.exclude, start = list(a = par_list$DiG["a"], b = par_list$DiG["b"], c = par_list$DiG["c"], d = par_list$DiG["d"], f = par_list$DiG["f"], g = par_list$DiG["g"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   #(31) Diphasic Grossman power
-  DiGpw = try(nls(as.formula(paste0(trait, "~","a*b*(1 - tanh(b*(",dim,"^k-c))^2) +d*f*(1 - tanh(f*(",dim,"-g))^2)")), data = x, na.action = na.exclude, start = list(a = 15.99, b = 0.3351, c = 4.693, d = 8687, f = 0.00226, g = 80.33, k = 0.435), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
+  DiGpw = try(nls(as.formula(paste0(trait, "~","a*b*(1 - tanh(b*(",dim,"^k-c))^2) +d*f*(1 - tanh(f*(",dim,"-g))^2)")), data = x, na.action = na.exclude, start = list(a = par_list$DiGpw["a"], b = par_list$DiGpw["b"], c = par_list$DiGpw["c"], d = par_list$DiGpw["d"], f = par_list$DiGpw["f"], g = par_list$DiGpw["g"], k = par_list$DiGpw["k"]), control = list(maxiter = 100, warnOnly = TRUE)), silent = TRUE)
 
 
   #(32) Legendre Polynomial 3th (Jacobson)
@@ -201,7 +214,7 @@ ModelsLac<-function(data,ID_col,ID,trait,dim, alpha,models){
   leg4 <- as.matrix(as.data.frame(polynomial.values(polynomials = legendre.polynomials(n = 4, normalized = TRUE), x = scaleX(y, u = -1, v = 1))))
   colnames(leg4) <- c("leg0", "leg1", "leg2", "leg3", "leg4")
   leg4 <- leg4[, 2:ncol(leg4)]
-  legpolWil = try(nls(as.formula(paste0(trait, "~","a*","leg4[,1]","+b*","leg4[,2]","+c*","leg4[,3]","+d*exp(-k*",dim,")")), data = x, na.action = na.exclude, start = list(a = -0.8, b = -0.6, c = 0.1, d = 25.7, k = 0.002)), silent = TRUE)
+  legpolWil = try(nls(as.formula(paste0(trait, "~","a*","leg4[,1]","+b*","leg4[,2]","+c*","leg4[,3]","+d*exp(-k*",dim,")")), data = x, na.action = na.exclude, start = list(a = par_list$legpolWil["a"], b = par_list$legpolWil["b"], c = par_list$legpolWil["c"], d = par_list$legpolWil["d"], k = par_list$legpolWil["k"])), silent = TRUE)
 
 
   #(35) Natural Cubic Spline (3 percentiles)
@@ -214,20 +227,20 @@ ModelsLac<-function(data,ID_col,ID,trait,dim, alpha,models){
   cubsplin5 = try(lm(as.formula(paste0(trait, "~","ns(",dim, ",df = 6)")), data = x, na.action = na.exclude),silent = TRUE)
 
   #(38) Natural Cubic Spline (defined Harrell)
-  cubsplindef = try(lm(as.formula(paste0(trait, "~","ns(",dim, ",knots = c(49, 78, 112, 157, 210))")), data = x, na.action = na.exclude), silent = TRUE)
+  cubsplindef = try(lm(as.formula(paste0(trait, "~","ns(",dim, ",knots =", par_list$cubsplindef,")")), data = x, na.action = na.exclude), silent = TRUE)
 
 
   ###Wilmink Poppe
 
-  start_values <- list(
-    b0 = min(x[,trait], na.rm = TRUE),
-    b1 = (max(x[,trait], na.rm = TRUE) - min(x[,trait], na.rm = TRUE)) / max(x[,dim], na.rm = TRUE),
-    b2 = (max(x[,trait], na.rm = TRUE) - min(x[,trait], na.rm = TRUE)) / 2
-  )
+  # start_values <- list(
+  #   b0 = min(x[,trait], na.rm = TRUE),
+  #   b1 = (max(x[,trait], na.rm = TRUE) - min(x[,trait], na.rm = TRUE)) / max(x[,dim], na.rm = TRUE),
+  #   b2 = (max(x[,trait], na.rm = TRUE) - min(x[,trait], na.rm = TRUE)) / 2
+  # )
 
   wilminkPop <- try(nls(as.formula(paste0(trait, "~","b0+b1*",dim,"+b2*exp(-0.5*",dim,")")),
                         data = x,
-                        start = start_values,
+                        start = par_list$wilminkPop,
                         algorithm = "port",
                         control = nls.control(maxiter = 500)),silent=TRUE)
 
@@ -263,10 +276,10 @@ ModelsLac<-function(data,ID_col,ID,trait,dim, alpha,models){
   # Ajustar el modelo con nlsLM
   Legpol4Poppe <- try(nlsLM(as.formula(paste0(trait, "~","legendre_function(b0, b1, b2, b3, b4, p0, p1, p2, p3, p4)")),
                             data = d_legendre,
-                            start = list(b0 = 0.5, b1 = 0.5, b2 = 0.5, b3 = 0.5, b4 = 0.5)),silent=TRUE)
+                            start = list(b0 = par_list$Legpol4Poppe["b0"], b1 = par_list$Legpol4Poppe["b1"], b2 = par_list$Legpol4Poppe["b2"], b3 = par_list$Legpol4Poppe["b3"], b4 = par_list$Legpol4Poppe["b4"])),silent=TRUE)
 
 
-  all_objects <- c("MMR","MME","brody23","brody24",
+  all_objects <- c("MM","MMR","MME","brody23","brody24",
                    "SCH","SCHL","PBE","wood","DHA",
                    "CB","QP","CLD","PapBo1","PapBo2",
                    "PapBo3", "PapBo4", "PapBo6", "GS1",

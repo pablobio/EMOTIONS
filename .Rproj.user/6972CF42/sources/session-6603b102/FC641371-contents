@@ -1,21 +1,28 @@
-#' Performs a QTL enrichment analysis based in a Bootstrap simulation for each QTL class 
-#' 
-#' Takes the output from find_genes_qtls_around_markers and run a QTL enrichment analysis 
-#' @param qtl_db The .gff file that can be downloaded from Animal QTlLdb
-#' @param qtl_file The output from find_genes_qtls_around_markers function
-#' @param qtl_type A character indicating which type of enrichment will be performed. QTL_type indicates that the enrichment processes will be performed for the QTL classes, while trait indicates that the enrichment analysis will be performed for each trait individually.
-#' @param enrich_type A character indicating if the enrichment analysis will be performed for all the chromosomes ("genome") or for a subset of chromosomes ("chromosome). If the "genome" option is selected, the results reported are the merge of all chromosomes. 
-#' @param chr.subset If enrich_type equal "chromosome", it is possible to define a subset of chromosomes to be analyzed. The default is equal NULL. Therefore, all the chromosomes will be analyzed.
-#' @param n.it number of iterations for the bootstrap simulation.
-#' @param nThreads The number of threads used.
-#' @param padj The alogorithm for multiple testing correction to be adopted ("holm", "hochberg", "hommel", "bonferroni", "BH", "BY","fdr", "none").
-#' @param parallel The type of parallel operation to be used.
-#' @return A data frame with the p-value for th enrichment result
-#' @importFrom utils read.delim
-#' @importFrom stats p.adjust
-#' @importFrom stats sd
-#' @importFrom parallel detectCores
-#' @importFrom dynamicTreeCut printFlush
-#' @importFrom doParallel registerDoParallel
-#' @importFrom boot boot
-#' @export
+library(dplyr)
+
+db.lac<-read.table("~/UniLeon/projetos/Resilience_heatStress_Sheep/lactations_ASSAF_Ruth/new_lactation_data/Database_all_Lacs_31_01_25.txt", h=T, sep="\t")
+
+db.lac<-db.lac[which(db.lac$More_1_Lac=="1_Lac"),]
+
+db.lac<- db.lac %>% group_by(CodGen,birth_date) %>% mutate(first_DIM=first(DIM_2), last_DIM=last(DIM_2))
+
+db.lac<-db.lac[which(db.lac$first_DIM==1 & db.lac$last_DIM==210),]
+
+ID.db<-data.frame(ID=unique(db.lac$CodGen))
+ID.db$ID2<-paste("ID",seq(1,nrow(ID.db),1),sep="")
+
+ID.db<-ID.db[sample(1:nrow(ID.db),100),]
+
+db.lac<-db.lac[which(db.lac$CodGen%in%ID.db$ID),]
+
+db.lac$ID2<-ID.db[match(db.lac$CodGen,ID.db$ID),"ID2"]
+
+db.lac<-as.data.frame(db.lac)
+
+db.lac<-db.lac[,c("ID2","DIM_2","Produccion_Final_Dia")]
+
+colnames(db.lac)<-c("ID","DIM","DMY")
+
+LacData<-db.lac
+
+save(LacData, file = "~/UniLeon/projetos/EnsembleLacs/data/LacData.rda")
