@@ -46,3 +46,90 @@ Ensemble models and model averaging are powerful techniques in predictive modeli
 
 The EnsembleLacs package provides a series of tools for the fit of 48 different lactation curve models previously reported in the literature. Once the data if fitted for each model, averaged predictions are obtaining using bagging based on AIC, BIC, root mean square percentage error (RMSPE), mean squared error (MAE) and variance. Additionally, the package also reports the milk daily records predictions based on Bayesian Model Averaging (BMA) and the cosine similarity for each model's predictions. The visualization of the model ranking across all the individual predictions is possible through functions (RidgeModels and ModelRankRange), allowing to better understand the weights assigned to each model. In addition, the predicted and actual daily milk records can be compared in the EnsembleLacs package using the PlotWeightLac function. Finally, the package also allows the user to estimate resilience indicators based on lag1-autocorrelation, logarithm of residual variance and residual skeweness using the predicted daily milking records.
 
+## Installing package
+
+The following code can be used to install the EnsembleLacs package.
+
+```{r, eval=FALSE}
+devtools::install_github("https://github.com/pablobio/EnsembleLacs")
+```
+
+## Analysis
+
+First, it is necessary to load the package.
+
+
+```{r}
+library(EnsembleLacs)
+```
+
+### Input file
+
+The EnsembleLacs has a dummy dataset composed by daily milk records (up to 210 days) for 100 unique individuals. This dataset can be accessed as followed:
+
+```{r}
+#Loading the dummy dataset
+data("LacData")
+
+#Checking the first rows
+head(LacData)
+```
+
+The dataframe is composed by three columns:
+
+- *ID:* Unique individual code
+- *DIM:* Days in milk
+- *DMY:* Daily milk yield
+
+### Getting ensemble from lactation curve models
+
+The main function of EnsembleLacs is named LacCurveFit. This is a wrap function that includes all the supplementary functions that allows the fit of the 48 lactation curve models. These models will receive as input the daily production and days in milk present in the LacData dataset. The following arguments must be provided to the LacCurveFit function.
+
+- *data:* A data frame containing the daily milking records
+- *ID:* The name of the column containing the unique IDs of the individuals
+- *trait:* The name of the column containing daily milking records
+- *dim:*  The name of the column containing days in milk records
+- *alpha:* A penalization factor, ranging from 0 to 1, for the estimation of the model`s weight
+- *models:* A vector describing the models to be included in the analysis. In total, 47 models are included in EmsembleLacs. The default option is "All", which results in the inclusion of the 47 models. Alternatively, a vector containing any subset of the following models can be provided: "MMR","MME","brody23","brody24", "SCH","SCHL","PBE","wood","DHA", "CB","QP","CLD","PapBo1","PapBo2", "PapBo3", "PapBo4", "PapBo6", "GS1",  "GS2","LQ", "wil", "wilk", "wilycsml", "BC", "DJK","MG2", "MG4", "MG", "KHN", "AS", "FRP","PTmult","PTmod", "MonoG", "MonoGpw", "DiG", "DiGpw","legpol3", "legpol4", "legpolWil", "cubsplin3", "cubsplin4", "cubsplin5", "cubsplindef", "wilminkPop", "qntReg", "Legpol4Poppe".
+- *param_list:* A list composed by the models, named as in the models parameter, and the repective parameters included in the models.
+
+```{r}
+#Running model's fitting and ensemble modelling
+out.ensemble<-LacCurveFit(data=LacData,ID="ID",trait="DMY",
+                          dim="DIM", alpha = 0.1,
+                          models = "All",param_list=NULL)
+
+```
+
+The output of the function LacCurveFit is composed by three main lists: converged_models, models_weight, and production. The list converged_models is composed by one list for each individual analyzed and stores the converged models obtained from the fitting of the 48 available models.
+
+```{r}
+#Checking the first six fitted models for the  individual ID2
+head(out.ensemble$converged_models$ID2)
+```
+
+The list models_weight contains one dataframe for each individual analyzed and stores the weights and ranks obtained for all converged models for all the ensemble methods available.
+
+```{r}
+#Checking the first six rows of the data frame containing the weights
+# and ranks of each fitted model for the individual ID2
+head(out.ensemble$models_weight$ID2)
+```
+
+The list production contains one dataframe for each individual analyzed and stores the predictions of daily milk records obtained for all the ensemble methods available.
+
+```{r}
+#Checking the first six rows of the data frame containing the predicted 
+# value obtained by all the ensemble methods applied
+head(out.ensemble$production$ID2)
+```
+
+The ranking of the models across all the individuals can be summarized and visualized using two function from EnsembleLacs: RidgeModels and ModelRankRange.
+
+The function RidgeModels allows the visualization of the distribution of model's ranks across individuals using ridge density plots. In this plot, each line represents a single model and the the density plot shows the frequency that the model was ranked in a specific position.
+
+```{r, fig.width=7, fig.height=5}
+#Ridge density plot based on the ranks obtained AIC as the weighting metric
+RidgeModels(out.ensemble,metric="AIC_rank")
+```
+

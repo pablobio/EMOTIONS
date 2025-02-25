@@ -1,4 +1,4 @@
-#' The function RidgeModels visualizes the distribution of model ranks across individuals using ridge density plots
+#' The function RidgeModels allows the visualization of the distribution of model's ranks across individuals using ridge density plots
 #' @param LacCurveFit The object obtained from the LacCurveFit function
 #' @param metric The name of the metric to be use to plot the model´s ranks
 #' @return A ridge density plots for the models included in the ensemble
@@ -8,8 +8,6 @@
 #' @importFrom ggridges  geom_density_ridges theme_ridges
 #' @export
 RidgeModels<-function(LacCurveFit,metric="AIC_rank"){
-
-  utils::globalVariables(c("Model", ".data", "Var2", "Freq"))
 
   data <- bind_rows(LacCurveFit$models_weight, .id = "ID")
 

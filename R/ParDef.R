@@ -2,8 +2,9 @@
 #'
 #' @param x  data frame containing the daily milking records for the individual
 #' @param trait The name of the column containing daily milking records
+#' @param dim The name of the column containing days in milk records
 #' @return A list containing the parameters to be included in the lactation curve models
-ParDef<-function(x,trait){
+ParDef<-function(x,trait,dim){
 
   par_list<-list(MM=c(a = 19.8, b = -1.65),
                  MMR=c(a = -10, b = -1.4),
@@ -43,8 +44,6 @@ ParDef<-function(x,trait){
                  MonoGpw=c(a = 24.5707, b = 0.6292, c = 1.9977, k = 0.1978),
                  DiG=c(a = 353.8, b = 0.016, c = 36.3, d = 7371, f = 0.003, g = 113.5),
                  DiGpw=c(a = 15.99, b = 0.3351, c = 4.693, d = 8687, f = 0.00226, g = 80.33, k = 0.435),
-                 legpol3=c(),
-                 legpol4=c(),
                  legpolWil=c(a= -0.8, b = -0.6, c = 0.1, d = 25.7, k = 0.002),
                  cubsplindef=c(knots="c(49, 78, 112, 157, 210)"),
                  wilminkPop=start_values <- list(

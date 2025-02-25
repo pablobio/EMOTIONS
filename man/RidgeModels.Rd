@@ -2,7 +2,7 @@
 % Please edit documentation in R/RidgeModels.R
 \name{RidgeModels}
 \alias{RidgeModels}
-\title{The function RidgeModels visualizes the distribution of model ranks across individuals using ridge density plots}
+\title{The function RidgeModels allows the visualization of the distribution of model's ranks across individuals using ridge density plots}
 \usage{
 RidgeModels(LacCurveFit, metric = "AIC_rank")
 }
@@ -15,5 +15,5 @@ RidgeModels(LacCurveFit, metric = "AIC_rank")
 A ridge density plots for the models included in the ensemble
 }
 \description{
-The function RidgeModels visualizes the distribution of model ranks across individuals using ridge density plots
+The function RidgeModels allows the visualization of the distribution of model's ranks across individuals using ridge density plots
 }

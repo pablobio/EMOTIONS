@@ -28,10 +28,10 @@ ModelsLac<-function(data,ID_col,ID,trait,dim, alpha,models,param_list=NULL){
 
 
   if(is.null(param_list)){
-  list_par<-ParDef(x,trait)
+  list_par<-ParDef(x,trait,dim)
   }else{
 
-    list_par<-ParDef(x,trait)
+    list_par<-ParDef(x,trait,dim)
 
     list_par[names(param_list)]<-param_list
 
