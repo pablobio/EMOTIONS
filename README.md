@@ -41,7 +41,7 @@ The vignette with the tutorial for the use of the main functions from EnsembleLa
 - **Pablo A. S. Fonseca**  
   Instituto de Ganadería de Montaña (CSIC-Univ. de León)  
   24346 Grulleros, León  
-  Email: [p.fonseca@unileon.es](mailto:p.fonseca@unileon.es)
+  Email: [p.fonseca@csic.es](mailto:p.fonseca@csic.es)
 
 - **Marcos Prates**  
   Department of Statistics, Universidade Federal de Minas Gerais, Brasil  
