@@ -36,8 +36,6 @@ knitr::opts_chunk$set(
 library(EnsembleLacs)
 ```
 
-##Run after the edit is finished: usethis::use_vignette("my-vignette")
-
 # **Introduction**
 
 The mathematical representation of lactation curves has significant applications in various areas of animal science. Models that simulate milk production under different conditions are valuable for physiologists, nutritionists, and geneticists, allowing them to study mammary gland function and test hypotheses. These models also support management decisions related to timing and efficiency. Over the past decades, numerous models have been proposed for representing lactation curves in dairy species. These models differ mainly in their regression type (linear or nonlinear), number of parameters, relationships among parameters, and ability to represent lactation patterns such as peak yield, time at peak, and persistency.
