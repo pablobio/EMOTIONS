@@ -4,7 +4,7 @@ author:
 - name: "Pablo A. S. Fonseca"
   affiliation: 
   - "Instituto de Ganadería de Montaña (CSIC-Univ. de León), 24346 Grulleros, León"
-  email: "p.fonseca@unileon.es"
+  email: "p.fonseca@csic.es"
 - name: "Marcos Prates"
   affiliation: 
   - "Department of statistics, Universidade Federal de Minas Gerai, Brasil"
