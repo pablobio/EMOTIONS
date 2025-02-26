@@ -15,7 +15,7 @@ ResInd(
 )
 }
 \arguments{
-\item{production_df}{The data frame containing the daily production records (actual or predicted) obtained from the LacCurveFit function}
+\item{production_df}{The list containing the data frames with the daily production records (actual or predicted) obtained from the LacCurveFit function}
 
 \item{dim_filter_range}{A vector containing the lower and upper limits to remove lactation records from the begin and end of the lactation, if needed. If it is not necessary to remove daily records, the first two values can be set as the minimum days in milk value and the last two as the maximum days in milk values}
 

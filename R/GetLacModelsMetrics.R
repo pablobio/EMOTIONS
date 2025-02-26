@@ -7,42 +7,34 @@
 #' @return A data frame containing the AIC, BIC, RMSPE and MAE for each fitted model for the individual
 GetLacModelsMetrics<-function(converged_models, x, trait){
 
-  # Assuming `converged_models` is your filtered list of models
   metrics_list <- lapply(names(converged_models), function(model_name) {
     model <- converged_models[[model_name]]
 
-    # Calculate predictions
     predictions <- predict(model, newdata = x)
 
-    # Calculate AIC based on model type
     aic_value <- if (inherits(model, "rq")) {
-      AIC.rq(model)  # For rq models
+      AIC.rq(model)
     } else if (inherits(model, c("lm", "nls"))) {
-      AIC(model)  # For lm and nls models
+      AIC(model)
     } else {
-      NA  # Default if model type doesn't match
+      NA
     }
 
-    # Calculate AIC based on model type
     bic_value <- if (inherits(model, "rq")) {
-      AIC.rq(model, k=log(length(predictions)))  # For rq models
+      AIC.rq(model, k=log(length(predictions)))
     } else if (inherits(model, c("lm", "nls"))) {
-      AIC(model, k=log(length(predictions)))  # For lm and nls models
+      AIC(model, k=log(length(predictions)))
     } else {
-      NA  # Default if model type doesn't match
+      NA
     }
 
-    # Calculate RMSPE
     rmspe_value <- sqrt(mean((x[,trait] - predictions)^2))
 
-    # Calculate MAE
     mae_value <- mean(abs(x[,trait] - predictions))
 
-    # Return metrics as a named list, including model name
     data.frame(Model = model_name, AIC = aic_value, BIC=bic_value, RMSPE = rmspe_value, MAE = mae_value)
   })
 
-  # Combine the list of data frames into a single data frame
   metrics_df <- do.call(rbind, metrics_list)
 
   return(metrics_df)

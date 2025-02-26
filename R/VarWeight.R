@@ -5,10 +5,8 @@
 #' @return A vector containing the model normalized weight
 VarWeight<-function(converged_models, x){
 
-  # Step 1: Generate predictions for each model
   predictions <- lapply(converged_models, predict, newdata = x)
 
-  # Calculate variance
   variances <- sapply(predictions, var)
   weights_var <- 1 / variances
   normalized_weights <- weights_var / sum(weights_var)

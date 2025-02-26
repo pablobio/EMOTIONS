@@ -46,11 +46,11 @@ ParDef<-function(x,trait,dim){
                  DiGpw=c(a = 15.99, b = 0.3351, c = 4.693, d = 8687, f = 0.00226, g = 80.33, k = 0.435),
                  legpolWil=c(a= -0.8, b = -0.6, c = 0.1, d = 25.7, k = 0.002),
                  cubsplindef=c(knots="c(49, 78, 112, 157, 210)"),
-                 wilminkPop=start_values <- list(
+                 wilminkPop=c(start_values = list(
                    b0 = min(x[,trait], na.rm = TRUE),
                    b1 = (max(x[,trait], na.rm = TRUE) - min(x[,trait], na.rm = TRUE)) / max(x[,dim], na.rm = TRUE),
                    b2 = (max(x[,trait], na.rm = TRUE) - min(x[,trait], na.rm = TRUE)) / 2
-                 ),
+                 )),
                  Legpol4Poppe=c(b0 = 0.5, b1 = 0.5, b2 = 0.5, b3 = 0.5, b4 = 0.5)
                  )
 

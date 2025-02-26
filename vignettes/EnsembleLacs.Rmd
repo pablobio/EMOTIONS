@@ -40,96 +40,249 @@ library(EnsembleLacs)
 
 # **Introduction**
 
-The mathematical representation of lactation curves has important applicability in different areas of animal science. Models that simulate milk production under various conditions are valuable for physiologists, nutritionists, and geneticists to study mammary gland function and test hypotheses, providing support to management decisions related to timing and efficiency. Several models have been proposed to model lactation curves for dairy species in the last decades. These models mainly differ from each other in the regression type (linear or nonlinear), number of parameter, relationship among the parameters, and the representation of lactation patterns, such as peak yield, time at peak, and persistency. Despite the advantages to have a wide range of model options to choose and the specificity of each individual model, the selection of a single model to represent the lactation curve might raise some limitations. Usually, the selection of the best model among the available options is based in the comparison among models for a metric, such as the Akaike information criteria (AIC) and Bayesian information criteria (BIC). The metric-based approach heavily relies on the assumption that the selected metric is a good criterion for model selection. However, these metrics can sometimes fail to correctly identify the best model, especially when there is no clear "best" model. Additionally, the use of a single model, based on a metric selection, can result in overfitting and bias introduction of individual models (especially if the number of variables is large or the dataset is noisy).
+The mathematical representation of lactation curves has significant applications in various areas of animal science. Models that simulate milk production under different conditions are valuable for physiologists, nutritionists, and geneticists, allowing them to study mammary gland function and test hypotheses. These models also support management decisions related to timing and efficiency. Over the past decades, numerous models have been proposed for representing lactation curves in dairy species. These models differ mainly in their regression type (linear or nonlinear), number of parameters, relationships among parameters, and ability to represent lactation patterns such as peak yield, time at peak, and persistency.
 
-Ensemble models and model averaging are powerful techniques in predictive modeling that enhance robustness, accuracy, and generalization. Instead of relying on a single model, ensemble methods combine multiple models to reduce variance, mitigate overfitting, and improve predictive performance. Model averaging, incorporates model uncertainty by weighting predictions according to their posterior probabilities, leading to more reliable estimates. These approaches are especially valuable when individual models exhibit variability in performance across different datasets or conditions. By integrating diverse model perspectives, ensemble methods improve stability and resilience, making them particularly useful in complex systems such as biological and ecological modeling, where uncertainty quantification is crucial. The use of ensemble models in the context of modelling lactation curves can be useful based on the wide variety of models available and the specificity of lactation curves for some species and/or conditions.
+Despite the advantages of having a diverse range of models, selecting a single model to represent the lactation curve can present limitations. Typically, model selection is based on comparing metrics such as the Akaike Information Criterion (AIC) and the Bayesian Information Criterion (BIC). However, this metric-based approach assumes that the chosen metric is an optimal criterion for model selection. In practice, these metrics may fail to correctly identify the best model, especially when no single model is clearly superior. Furthermore, using a single model selected based on these metrics can lead to overfitting and introduce bias, particularly when the dataset is noisy or contains numerous variables.
 
-The EnsembleLacs package provides a series of tools for the fit of 48 different lactation curve models previously reported in the literature. Once the data if fitted for each model, averaged predictions are obtaining using bagging based on AIC, BIC, root mean square percentage error (RMSPE), mean squared error (MAE) and variance. Additionally, the package also reports the milk daily records predictions based on Bayesian Model Averaging (BMA) and the cosine similarity for each model's predictions. The visualization of the model ranking across all the individual predictions is possible through functions (RidgeModels and ModelRankRange), allowing to better understand the weights assigned to each model. In addition, the predicted and actual daily milk records can be compared in the EnsembleLacs package using the PlotWeightLac function. Finally, the package also allows the user to estimate resilience indicators based on lag1-autocorrelation, logarithm of residual variance and residual skeweness using the predicted daily milking records.
+Ensemble modeling and model averaging are powerful techniques that enhance robustness, accuracy, and generalization in predictive modeling. Instead of relying on a single model, ensemble methods combine multiple models to reduce variance, mitigate overfitting, and improve predictive performance. Model averaging incorporates model uncertainty by weighting predictions according to their posterior probabilities, leading to more reliable estimates. These approaches are particularly valuable when individual models exhibit varying performance across different datasets or conditions. By integrating multiple models, ensemble methods improve stability and resilience, making them especially useful in complex biological and ecological systems where uncertainty quantification is crucial.
 
-## Installing package
+The **EnsembleLacs** package provides a set of tools for fitting 47 different lactation curve models previously reported in the literature. Some of these models and the pre-defined starting parameters were obtained from the lactcurves R package (https://cran.r-project.org/web/packages/lactcurves/index.html). Once the data is fitted to each model, ensemble predictions are generated using bagging based on AIC, BIC, root mean square percentage error (RMSPE), mean absolute error (MAE), and variance. Additionally, the package provides predictions for daily milk records using Bayesian Model Averaging (BMA) and calculates cosine similarity for each model's predictions. The ranking of models across individual predictions can be visualized using the **RidgeModels** and **ModelRankRange** functions, which help users better understand the weight assigned to each model. Furthermore, the **PlotWeightLac** function allows users to compare predicted and actual daily milk records. Lastly, **EnsembleLacs** enables the estimation of resilience indicators based on lag-1 autocorrelation, logarithm of residual variance, and residual skewness using predicted daily milking records.
 
-The following code can be used to install the EnsembleLacs package.
+## **Installing the Package**
+
+Use the following code to install **EnsembleLacs**:
 
 ```{r, eval=FALSE}
 devtools::install_github("https://github.com/pablobio/EnsembleLacs")
 ```
 
-## Analysis
+## **Analysis**
 
-First, it is necessary to load the package.
-
+### **Loading the Package**
 
 ```{r}
 library(EnsembleLacs)
 ```
 
-### Input file
+### **Input Data**
 
-The EnsembleLacs has a dummy dataset composed by daily milk records (up to 210 days) for 100 unique individuals. This dataset can be accessed as followed:
+**EnsembleLacs** includes a dummy dataset containing daily milk records (up to 210 days) for 100 unique individuals. This dataset can be accessed as follows:
 
 ```{r}
-#Loading the dummy dataset
+# Load the dummy dataset
 data("LacData")
 
-#Checking the first rows
+# Display the first rows
 head(LacData)
 ```
 
-The dataframe is composed by three columns:
+The dataset consists of three columns:
 
-- *ID:* Unique individual code
-- *DIM:* Days in milk
-- *DMY:* Daily milk yield
+- **ID:** Unique individual identifier
+- **DIM:** Days in milk
+- **DMY:** Daily milk yield
 
-### Getting ensemble from lactation curve models
+### **Fitting Lactation Curve Models and Generating Ensembles**
 
-The main function of EnsembleLacs is named LacCurveFit. This is a wrap function that includes all the supplementary functions that allows the fit of the 48 lactation curve models. These models will receive as input the daily production and days in milk present in the LacData dataset. The following arguments must be provided to the LacCurveFit function.
+The core function of **EnsembleLacs** is **LacCurveFit**. This wrapper function integrates multiple supplementary functions that fit 47 lactation curve models. It takes daily milk production and days in milk from **LacData** as input. The following arguments must be provided:
 
-- *data:* A data frame containing the daily milking records
-- *ID:* The name of the column containing the unique IDs of the individuals
-- *trait:* The name of the column containing daily milking records
-- *dim:*  The name of the column containing days in milk records
-- *alpha:* A penalization factor, ranging from 0 to 1, for the estimation of the model`s weight
-- *models:* A vector describing the models to be included in the analysis. In total, 47 models are included in EmsembleLacs. The default option is "All", which results in the inclusion of the 47 models. Alternatively, a vector containing any subset of the following models can be provided: "MMR","MME","brody23","brody24", "SCH","SCHL","PBE","wood","DHA", "CB","QP","CLD","PapBo1","PapBo2", "PapBo3", "PapBo4", "PapBo6", "GS1",  "GS2","LQ", "wil", "wilk", "wilycsml", "BC", "DJK","MG2", "MG4", "MG", "KHN", "AS", "FRP","PTmult","PTmod", "MonoG", "MonoGpw", "DiG", "DiGpw","legpol3", "legpol4", "legpolWil", "cubsplin3", "cubsplin4", "cubsplin5", "cubsplindef", "wilminkPop", "qntReg", "Legpol4Poppe".
-- *param_list:* A list composed by the models, named as in the models parameter, and the repective parameters included in the models.
+- **data:** Data frame containing daily milking records
+- **ID:** Column name containing unique individual IDs
+- **trait:** Column name containing daily milking records
+- **dim:** Column name containing days in milk records
+- **alpha:** Penalization factor (ranging from 0 to 1) for model weight estimation (this parameter should be fine-tuned based on predictions)
+- **models:** Vector specifying models to include. The default is **"All"**, which includes all 47 models. Alternatively, users can specify a subset of models.
+- **param_list:** List specifying model parameters (optional)
+
+Example usage:
 
 ```{r, warning=FALSE}
-#Running model's fitting and ensemble modelling
-out.ensemble<-LacCurveFit(data=LacData,ID="ID",trait="DMY",
-                          dim="DIM", alpha = 0.1,
-                          models = "All",param_list=NULL)
-
+# Running model fitting and ensemble modeling
+out.ensemble <- LacCurveFit(
+  data = LacData, ID = "ID", trait = "DMY",
+  dim = "DIM", alpha = 0.1,
+  models = "All", param_list = NULL
+)
 ```
 
-The output of the function LacCurveFit is composed by three main lists: converged_models, models_weight, and production. The list converged_models is composed by one list for each individual analyzed and stores the converged models obtained from the fitting of the 48 available models.
+The output of **LacCurveFit** consists of three main lists:
+
+1. **converged_models**: Stores the converged models for each individual.
+2. **models_weight**: Stores model weights and ranks for all ensemble methods.
+3. **production**: Stores predicted daily milk records for all ensemble methods.
+
+Checking the first six fitted models for individual **ID2**:
 
 ```{r}
-#Checking the first six fitted models for the  individual ID2
 head(out.ensemble$converged_models$ID2)
 ```
 
-The list models_weight contains one dataframe for each individual analyzed and stores the weights and ranks obtained for all converged models for all the ensemble methods available.
+Checking the first six rows of the **models_weight** list:
 
 ```{r}
-#Checking the first six rows of the data frame containing the weights
-# and ranks of each fitted model for the individual ID2
 head(out.ensemble$models_weight$ID2)
 ```
 
-The list production contains one dataframe for each individual analyzed and stores the predictions of daily milk records obtained for all the ensemble methods available.
+Checking the first six rows of the **production** list:
 
 ```{r}
-#Checking the first six rows of the data frame containing the predicted 
-# value obtained by all the ensemble methods applied
 head(out.ensemble$production$ID2)
 ```
 
-The ranking of the models across all the individuals can be summarized and visualized using two function from EnsembleLacs: RidgeModels and ModelRankRange.
+### **Available Weighting Methods**
 
-The function RidgeModels allows the visualization of the distribution of model's ranks across individuals using ridge density plots. In this plot, each line represents a single model and the the density plot shows the frequency that the model was ranked in a specific position.
+The ensemble predictions are obtained using different weighting methods:
+
+- **weight_AIC:** Weighted by AIC
+- **weight_BIC:** Weighted by BIC
+- **weight_RMSPE:** Weighted by RMSPE
+- **weight_MAE:** Weighted by MAE
+- **weight_BMA:** Bayesian Model Averaging
+- **weight_Var:** Weighted by residual variance
+- **weight_CosSquared:** Weighted by cosine similarity
+- **SMA:** Simple Model Average (equal weights for all models)
+
+### **Visualizing Model Ranking**
+
+Model ranking across individuals can be visualized using **RidgeModels** and **ModelRankRange**.
 
 ```{r, fig.width=7, fig.height=8}
-#Ridge density plot based on the ranks obtained AIC as the weighting metric
-RidgeModels(out.ensemble,metric="AIC_rank")
+RidgeModels(out.ensemble, metric = "AIC_rank")
+```
+
+```{r, fig.width=7, fig.height=8}
+ModelRankRange(out.ensemble, metric = "AIC_rank")
+```
+
+### **Plotting Actual vs. Predicted Daily Milk Yield**
+
+Another visualization option provided by EnsembleLacs is the **PlotWeightLac** function. This function plots the actual daily milk daily production and the predicted values obtained by the ensemble model.The arguments that must be provided to this function are:
+  
+  - *data:* The list generated by the LacCurveFit with the predicted daily milking records
+- *ID:* The ID of the individual that will have the daily milking records plotted
+- *trait:* The name of the column containing actual daily milking records
+- *metric:* The name of the strategy used obtained the predicted values through the ensemble model
+- *dim:* The name of the column containing days in milk records
+- *col:* The colors of the actual and predicted values
+
+```{r, fig.width=7, fig.height=8}
+PlotWeightLac(
+  data = out.ensemble, ID = "ID2",
+  trait = "DMY", metric = "weight_AIC",
+  dim = "DIM", col = c("red", "blue")
+)
+```
+
+### **Customizing Model Selection**
+
+The function LacCurveFit allows the customization of the models to be included in the ensemble as well as the parameters of the models.
+
+The EnsembleLacs package has a dataset with the list of models, and its respective acronyms, available in the package. This dataset can be accessed using the following command.
+
+```{r}
+data("models_EnsembleLacs")
+head(models_EnsembleLacs)
+```
+
+Users can select specific models to include in the ensemble. For example, the following models will be used to generate the ensemble: `wil`, `wilk`, `wilycsml`, `DiG`, `DiGpw`, `legpol3`, `legpol4`, `legpolWil`, `cubsplin3`, `cubsplin4`, `cubsplin5`, `cubsplindef`, `wilminkPop`, and `qntReg`.
+
+```{r, warning=FALSE}
+out.ensemble.sub <- LacCurveFit(
+  data = LacData,
+  ID = "ID",
+  trait = "DMY",
+  dim = "DIM",
+  alpha = 0.1,
+  models = c("wil", "wilk", "wilycsml", "DiG", "DiGpw", "legpol3", 
+             "legpol4", "legpolWil", "cubsplin3", "cubsplin4", "cubsplin5", 
+             "cubsplindef", "wilminkPop", "qntReg"),
+  param_list = NULL
+)
+```
+
+### Evaluating Model Ranks
+
+The ranking of the selected models can be evaluated using a ridge density plot based on AIC scores:
+
+```{r, fig.width=7, fig.height=8}
+RidgeModels(out.ensemble.sub, metric = "AIC_rank")
+```
+
+### Customizing Model Parameters
+
+Users can access the list of models that support parameter customization and their respective parameters using the `model_pars` dataset:
+
+```{r}
+data(model_pars)
+head(model_pars)
+```
+
+For instance, the starting values of the parameters for models `MM` and `wil` can be modified as follows:
+
+```{r, warning=FALSE}
+edited_list <- list(
+  MM = c(a = 20, b = -2),
+  wil = c(a = 35, b = -5, c = -0.01, k = 0.2)
+)
+
+out.ensemble.edited <- LacCurveFit(
+  data = LacData,
+  ID = "ID",
+  trait = "DMY",
+  dim = "DIM",
+  alpha = 0.1,
+  models = "All",
+  param_list = edited_list
+)
+```
+
+Model convergence can be checked using:
+
+```{r}
+out.ensemble.edited$converged_models$ID2[["MM"]]
+out.ensemble.edited$converged_models$ID2[["wil"]]
+```
+
+### Calculating Resilience Indicators
+
+The `ResInd` function calculates resilience estimators, including logarithm of variance, lag-1 autocorrelation, and skewness, based on the weighted predictions. The required parameters are:
+
+- `production_df`: A list containing data frames with daily production records (either actual or predicted) from `LacCurveFit`.
+- `dim_filter_range`: A vector defining the lower and upper limits for filtering lactation records at the beginning and end of lactation. If no filtering is needed, set the first two values as the minimum DIM and the last two as the maximum DIM.
+- `outlier_sd_threshold`: A threshold specifying the maximum standard deviations for identifying outlier resilience indicators.
+- `weight`: The column name containing the selected ensemble prediction (default: `weight_AIC`).
+- `trait`: The column name containing daily milk yield records.
+- `DIM`: The column name containing days in milk records.
+- `ID_col`: The column name containing unique animal IDs.
+
+```{r}
+out.res <- ResInd(
+  out.ensemble$production,
+  dim_filter_range = c(1, 7, 203, 210),
+  outlier_sd_threshold = 4,
+  weight = "weight_AIC",
+  trait = "DMY",
+  DIM = "DIM",
+  ID_col = "ID"
+)
+```
+
+The output of `ResInd` is a list containing:
+
+1. `ri_filtered`: A data frame with daily milk production after filtering and the estimated resilience indicators.
+2. `dev_list`: A list of deviations for each animal and DIM.
+3. `removed_samples`: A list of animals identified as outliers and removed from analysis.
+4. `ri_stats`: A data frame summarizing the resilience indicators.
+
+The first six rows of the filtered dataset can be accessed as follows:
+
+```{r}
+head(out.res$ri_filtered)
+```
+
+The summary statistics for the resilience indicators can be retrieved using:
+
+```{r}
+out.res$ri_stats
 ```
 

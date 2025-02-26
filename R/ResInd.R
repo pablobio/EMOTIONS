@@ -1,5 +1,5 @@
 #' A function to estimate resilience estimators (logarithm of variance, lag1 autocorrelation and skewness) based on daily milk production records
-#' @param production_df The data frame containing the daily production records (actual or predicted) obtained from the LacCurveFit function
+#' @param production_df The list containing the data frames with the daily production records (actual or predicted) obtained from the LacCurveFit function
 #' @param dim_filter_range A vector containing the lower and upper limits to remove lactation records from the begin and end of the lactation, if needed. If it is not necessary to remove daily records, the first two values can be set as the minimum days in milk value and the last two as the maximum days in milk values
 #' @param outlier_sd_threshold A threshold defining the maximum standard deviations to consider an individual resilience indicator value
 #' @param weight The name of the column containing the selected ensemble prediction. The default is weight_AIC
@@ -12,12 +12,11 @@
 #' @importFrom tidyselect everything
 #' @return A list containing the daily milk production values after filtering, the list of removed animals, and a data frame with the resilience indicators
 #' @export
-ResInd <- function(production_df,
-                                  dim_filter_range = c(1, 7, 203, 210),
+ResInd <- function(production_df,dim_filter_range = c(1, 7, 203, 210),
                                   outlier_sd_threshold = 4,
                                   weight="weight_AIC",trait,DIM,ID_col) {
 
-  utils::globalVariables(c(".data"))
+  production_df<-do.call(rbind,production_df)
 
   production_df$CodGen <- production_df[,ID_col]
 
@@ -25,9 +24,6 @@ ResInd <- function(production_df,
 
   production_df$dev <- production_df[,trait] - production_df[,weight]
 
-  #######################
-  ### Obtener los indicadores de resiliencia a partir de estas desviaciones
-  ##########################
   desviaciones_filtradas <- production_df %>%
     filter(!(DIM >= dim_filter_range[1] & DIM <= dim_filter_range[2]) &
              !(DIM >= dim_filter_range[3] & DIM <= dim_filter_range[4]))
@@ -48,9 +44,7 @@ ResInd <- function(production_df,
       skewness = skewness(dev, na.rm = TRUE)$Skewness
     )
 
-  ##########################
-  ### Filtrar ri eliminando outliers según el umbral de desviación estándar proporcionado
-  ##########################
+
   ri_summary <- ri %>%
     summarise(
       mean_log_varianza = mean(log_varianza, na.rm = TRUE),
@@ -61,7 +55,7 @@ ResInd <- function(production_df,
       sd_skewness = sd(skewness, na.rm = TRUE)
     )
 
-  ri_filtrados <- ri %>%
+  ri_filtered <- ri %>%
     filter(
       log_varianza >= (ri_summary$mean_log_varianza - outlier_sd_threshold * ri_summary$sd_log_varianza) &
         log_varianza <= (ri_summary$mean_log_varianza + outlier_sd_threshold * ri_summary$sd_log_varianza) &
@@ -71,30 +65,24 @@ ResInd <- function(production_df,
         skewness <= (ri_summary$mean_skewness + outlier_sd_threshold * ri_summary$sd_skewness)
     )
 
-  animales_descartados <- setdiff(ri$CodGen, ri_filtrados$CodGen)
+  removed_samples <- setdiff(ri$CodGen, ri_filtered$CodGen)
 
-  ##########################
-  ### Añadir la media de producción por CodGen a ri
-  ##########################
+
   media_prod_por_codgen <- production_df %>%
     group_by(CodGen) %>%
     summarise(mean_Prod = mean(.data[[trait]], na.rm = TRUE))
 
-  ri_filtrados <- ri_filtrados %>%
+  ri_filtered <- ri_filtered %>%
     left_join(media_prod_por_codgen, by = "CodGen")
 
-  ##########################
-  ### Generar lista de desviaciones por animal y DIM
-  ##########################
+
   dev_list <- production_df %>%
     select(CodGen, DIM, dev)
 
   rownames(dev_list) <- NULL
 
-  ##########################
-  ### Generar estadísticas descriptivas de indicadores de resiliencia
-  ##########################
-  ri_stats <- ri_filtrados %>%
+
+  ri_stats <- ri_filtered %>%
     summarise(
       log_varianza_mean = mean(log_varianza, na.rm = TRUE),
       log_varianza_sd = sd(log_varianza, na.rm = TRUE),
@@ -120,13 +108,11 @@ ResInd <- function(production_df,
       names_pattern = "(.*)_(mean|sd|min|max)"
     )
 
-  ##########################
-  ### Resultados finales
-  ##########################
+
   return(list(
-    ri_filtrados = ri_filtrados,
+    ri_filtered = ri_filtered,
     dev_list = dev_list,
-    animales_descartados = animales_descartados,
+    removed_samples = removed_samples,
     ri_stats = ri_stats
   ))
 }

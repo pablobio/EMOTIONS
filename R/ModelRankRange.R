@@ -6,12 +6,8 @@
 #' @export
 ModelRankRange<-function(LacCurveFit,metric="AIC_rank"){
 
-
-  utils::globalVariables(c("Model", "min_value", "max_value", ".data"))
-
   data <- bind_rows(LacCurveFit$models_weight, .id = "ID")
 
-  # Calculate min and max AIC_rank for each model
   range_df <- data %>%
     group_by(Model) %>%
     summarise(min_value = min(!!sym(metric)), max_value = max(!!sym(metric)))
