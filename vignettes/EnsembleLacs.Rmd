@@ -1,31 +1,31 @@
 ---
-title: "EnsembleLacs"
+  title: "EnsembleLacs"
 author: 
-- name: "Pablo A. S. Fonseca"
-  affiliation: 
+  - name: "Pablo A. S. Fonseca"
+affiliation: 
   - "Instituto de Ganadería de Montaña (CSIC-Univ. de León), 24346 Grulleros, León"
-  email: "p.fonseca@unileon.es"
+email: "p.fonseca@unileon.es"
 - name: "Marcos Prates"
-  affiliation: 
+affiliation: 
   - "Department of statistics, Universidade Federal de Minas Gerai, Brasil"
 - name: "Aroa Suárez-Vega"
-  affiliation: "Dpto. Producción Animal, Facultad de Veterinaria, Universidad de León (24007)"
+affiliation: "Dpto. Producción Animal, Facultad de Veterinaria, Universidad de León (24007)"
 - name: "Ruth Arribas Gonzalo"
-  affiliation: "Dpto. Producción Animal, Facultad de Veterinaria, Universidad de León (24007)"
+affiliation: "Dpto. Producción Animal, Facultad de Veterinaria, Universidad de León (24007)"
 - name: "Beatriz Gutierrez-Gil"
-  affiliation: "Dpto. Producción Animal, Facultad de Veterinaria, Universidad de León (24007)"
+affiliation: "Dpto. Producción Animal, Facultad de Veterinaria, Universidad de León (24007)"
 - name: "Juan José Arranz"
-  affiliation: "Dpto. Producción Animal, Facultad de Veterinaria, Universidad de León (24007)" 
+affiliation: "Dpto. Producción Animal, Facultad de Veterinaria, Universidad de León (24007)" 
 
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{EnsembleLacs}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteEncoding{UTF-8}
 ---
-
-```{r, include = FALSE}
+  
+  ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -35,8 +35,6 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(EnsembleLacs)
 ```
-
-##Run after the edit is finished: usethis::use_vignette("my-vignette")
 
 # **Introduction**
 
