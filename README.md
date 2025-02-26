@@ -3,11 +3,11 @@
 **INDEX**
 
 -   📝 [Introduction](#introduction)
--   🛠️ [Installation](#installation)
--   💻 [Analysis](#analysis)
--   🤝 [Authors](#authors)
--   📜 [Licence](#licence)
--   ✉️ [Contact](#contact)
+-   🛠️ [Installation](#Installing-the-Package)
+-   💻 [Analysis](#Analysis)
+-   🤝 [Authors](#Authors)
+-   📜 [Licence](#License)
+-   ✉️ [Contact](#Contact)
 
 ## **Introduction**
 
