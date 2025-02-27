@@ -1,4 +1,4 @@
-# EnsembleLacs: An R package for Ensemble Modeling for Lactation Curves
+# EMOTIONS: Ensemble Models fOr lacTatION curveS
 
 **INDEX**
 
@@ -17,14 +17,14 @@ Despite the advantages of having a diverse range of models, selecting a single m
 
 Ensemble modeling and model averaging are powerful techniques that enhance robustness, accuracy, and generalization in predictive modeling. Instead of relying on a single model, ensemble methods combine multiple models to reduce variance, mitigate overfitting, and improve predictive performance. Model averaging incorporates model uncertainty by weighting predictions according to their posterior probabilities, leading to more reliable estimates. These approaches are particularly valuable when individual models exhibit varying performance across different datasets or conditions. By integrating multiple models, ensemble methods improve stability and resilience, making them especially useful in complex biological and ecological systems where uncertainty quantification is crucial.
 
-The **EnsembleLacs** package provides a set of tools for fitting 47 different lactation curve models previously reported in the literature. Some of these models and the pre-defined starting parameters were obtained from the lactcurves R package (https://cran.r-project.org/web/packages/lactcurves/index.html). Once the data is fitted to each model, ensemble predictions are generated using bagging based on AIC, BIC, root mean square percentage error (RMSPE), mean absolute error (MAE), and variance. Additionally, the package provides predictions for daily milk records using Bayesian Model Averaging (BMA) and calculates cosine similarity for each model's predictions. The ranking of models across individual predictions can be visualized using the **RidgeModels** and **ModelRankRange** functions, which help users better understand the weight assigned to each model. Furthermore, the **PlotWeightLac** function allows users to compare predicted and actual daily milk records. Lastly, **EnsembleLacs** enables the estimation of resilience indicators based on lag-1 autocorrelation, logarithm of residual variance, and residual skewness using predicted daily milking records.
+The **EMOTIONS** package provides a set of tools for fitting 47 different lactation curve models previously reported in the literature. Some of these models and the pre-defined starting parameters were obtained from the lactcurves R package (https://cran.r-project.org/web/packages/lactcurves/index.html). Once the data is fitted to each model, ensemble predictions are generated using bagging based on AIC, BIC, root mean square percentage error (RMSPE), mean absolute error (MAE), and variance. Additionally, the package provides predictions for daily milk records using Bayesian Model Averaging (BMA) and calculates cosine similarity for each model's predictions. The ranking of models across individual predictions can be visualized using the **RidgeModels** and **ModelRankRange** functions, which help users better understand the weight assigned to each model. Furthermore, the **PlotWeightLac** function allows users to compare predicted and actual daily milk records. Lastly, **EMOTIONS** enables the estimation of resilience indicators based on lag-1 autocorrelation, logarithm of residual variance, and residual skewness using predicted daily milking records.
 
 ## **Installing the Package**
 
 Use the following code to install **EnsembleLacs**:
 
 ```{r, eval=FALSE}
-devtools::install_github("https://github.com/pablobio/EnsembleLacs")
+devtools::install_github("https://github.com/pablobio/EMOTIONS")
 ```
 
 ## **Analysis**
@@ -32,9 +32,9 @@ devtools::install_github("https://github.com/pablobio/EnsembleLacs")
 ### **Loading the Package**
 
 ```{r}
-library(EnsembleLacs)
+library(EMOTIONS)
 ```
-The vignette with the tutorial for the use of the main functions from EnsembleLacs is available here: https://rpubs.com/pablo_bio/EnsembleLacs_vignette
+The vignette with the tutorial for the use of the main functions from EnsembleLacs is available here: https://rpubs.com/pablo_bio/EMOTIONS_vignette
 
 ## Authors
 
