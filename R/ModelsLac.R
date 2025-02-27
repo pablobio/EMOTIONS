@@ -16,6 +16,7 @@
 #' @importFrom stats nls.control
 #' @importFrom quantreg rq
 #' @importFrom minpack.lm nlsLM
+#' @importFrom splines ns
 #' @return A list containing the fitted models, the model`s weigths and ranks, and the predicted daily production obtained through the model ensemble
 ModelsLac<-function(data,ID_col,ID,trait,dim, alpha,models,param_list=NULL, silent=silent){
 

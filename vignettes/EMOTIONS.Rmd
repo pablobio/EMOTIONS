@@ -99,7 +99,7 @@ Example usage:
 out.ensemble <- LacCurveFit(
   data = LacData, ID = "ID", trait = "DMY",
   dim = "DIM", alpha = 0.1,
-  models = "All", param_list = NULL
+  models = "All", param_list = NULL, silent=TRUE
 )
 ```
 
@@ -144,13 +144,15 @@ The ensemble predictions are obtained using different weighting methods:
 
 Model ranking across individuals can be visualized using **RidgeModels** and **ModelRankRange**.
 
-```{r, fig.width=7, fig.height=8}
+```{r, fig.width=7, fig.height=9}
 RidgeModels(out.ensemble, metric = "AIC_rank")
 ```
 
-```{r, fig.width=7, fig.height=8}
+```{r, fig.width=7, fig.height=9}
 ModelRankRange(out.ensemble, metric = "AIC_rank")
 ```
+
+Note that the function ModelRankRange displays the number of individuals which the model was converged in front of each line.
 
 ### **Plotting Actual vs. Predicted Daily Milk Yield**
 

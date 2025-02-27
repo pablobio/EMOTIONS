@@ -13,7 +13,7 @@ Authors@R: c(person(given = "Pablo",
 Description: The package EMOTIONS fits 47 models for lactation curves and creates
               ensemble models using model averaging based on Akaike information                     criterion (AIC), Bayeasian information criterion (BIC), root mean square               percentage error (RMSPE) and mean squared error (MAE), variance of the                predictions, cosine similarity for each model's predictions, and                      Bayesian Model Average (BMA). The daily production values predicted                   through the ensemble models can be used to estimate resilience                        indicators in the package. Additionally, the package allows the                       graphical visualization of the model ranks and the predicted lactation                curves.
 Depends: R (>= 4.2)
-Imports: dplyr, orthopolynom, quantreg, minpack.lm, tidyr, ggplot2,  ggridges, parameters, rlang, tidyselect
+Imports: dplyr, orthopolynom, quantreg, minpack.lm, tidyr, ggplot2,  ggridges, parameters, rlang, tidyselect, splines
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
