@@ -3,7 +3,7 @@
 \docType{data}
 \name{model_pars}
 \alias{model_pars}
-\title{A data frame containing the models included in the EnsembleLacs package that can have the parameters edited}
+\title{A data frame containing the models included in the EMOTIONS package that can have the parameters edited}
 \format{
 A data frame with 42 rows and 2 variables:
 \itemize{
@@ -15,7 +15,7 @@ A data frame with 42 rows and 2 variables:
 data(model_pars)
 }
 \description{
-A data frame containing the models included in the EnsembleLacs package that can have the parameters edited
+A data frame containing the models included in the EMOTIONS package that can have the parameters edited
 }
 \examples{
 data(model_pars)

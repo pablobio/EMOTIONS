@@ -1,4 +1,4 @@
-#'A data frame containing the models included in the EnsembleLacs package that can have the parameters edited
+#'A data frame containing the models included in the EMOTIONS package that can have the parameters edited
 #'
 #'@docType data
 #'

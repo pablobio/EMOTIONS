@@ -1,5 +1,5 @@
 ---
-title: "EnsembleLacs"
+title: "EMOTIONS: Ensemble Models fOr lacTatION curveS"
 author: 
 - name: "Pablo A. S. Fonseca"
   affiliation: 
@@ -20,7 +20,7 @@ author:
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{EnsembleLacs}
+  %\VignetteIndexEntry{EMOTIONS}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -33,7 +33,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-library(EnsembleLacs)
+library(EMOTIONS)
 ```
 
 # **Introduction**
@@ -44,14 +44,14 @@ Despite the advantages of having a diverse range of models, selecting a single m
 
 Ensemble modeling and model averaging are powerful techniques that enhance robustness, accuracy, and generalization in predictive modeling. Instead of relying on a single model, ensemble methods combine multiple models to reduce variance, mitigate overfitting, and improve predictive performance. Model averaging incorporates model uncertainty by weighting predictions according to their posterior probabilities, leading to more reliable estimates. These approaches are particularly valuable when individual models exhibit varying performance across different datasets or conditions. By integrating multiple models, ensemble methods improve stability and resilience, making them especially useful in complex biological and ecological systems where uncertainty quantification is crucial.
 
-The **EnsembleLacs** package provides a set of tools for fitting 47 different lactation curve models previously reported in the literature. Some of these models and the pre-defined starting parameters were obtained from the lactcurves R package (https://cran.r-project.org/web/packages/lactcurves/index.html). Once the data is fitted to each model, ensemble predictions are generated using bagging based on AIC, BIC, root mean square percentage error (RMSPE), mean absolute error (MAE), and variance. Additionally, the package provides predictions for daily milk records using Bayesian Model Averaging (BMA) and calculates cosine similarity for each model's predictions. The ranking of models across individual predictions can be visualized using the **RidgeModels** and **ModelRankRange** functions, which help users better understand the weight assigned to each model. Furthermore, the **PlotWeightLac** function allows users to compare predicted and actual daily milk records. Lastly, **EnsembleLacs** enables the estimation of resilience indicators based on lag-1 autocorrelation, logarithm of residual variance, and residual skewness using predicted daily milking records.
+The **EMOTIONS** package provides a set of tools for fitting 47 different lactation curve models previously reported in the literature. Some of these models and the pre-defined starting parameters were obtained from the lactcurves R package (https://cran.r-project.org/web/packages/lactcurves/index.html). Once the data is fitted to each model, ensemble predictions are generated using bagging based on AIC, BIC, root mean square percentage error (RMSPE), mean absolute error (MAE), and variance. Additionally, the package provides predictions for daily milk records using Bayesian Model Averaging (BMA) and calculates cosine similarity for each model's predictions. The ranking of models across individual predictions can be visualized using the **RidgeModels** and **ModelRankRange** functions, which help users better understand the weight assigned to each model. Furthermore, the **PlotWeightLac** function allows users to compare predicted and actual daily milk records. Lastly, **EMOTIONS** enables the estimation of resilience indicators based on lag-1 autocorrelation, logarithm of residual variance, and residual skewness using predicted daily milking records.
 
 ## **Installing the Package**
 
-Use the following code to install **EnsembleLacs**:
+Use the following code to install **EMOTIONS**:
 
 ```{r, eval=FALSE}
-devtools::install_github("https://github.com/pablobio/EnsembleLacs")
+devtools::install_github("https://github.com/pablobio/EMOTIONS")
 ```
 
 ## **Analysis**
@@ -59,12 +59,12 @@ devtools::install_github("https://github.com/pablobio/EnsembleLacs")
 ### **Loading the Package**
 
 ```{r}
-library(EnsembleLacs)
+library(EMOTIONS)
 ```
 
 ### **Input Data**
 
-**EnsembleLacs** includes a dummy dataset containing daily milk records (up to 210 days) for 100 unique individuals. This dataset can be accessed as follows:
+**EMOTIONS** includes a dummy dataset containing daily milk records (up to 210 days) for 100 unique individuals. This dataset can be accessed as follows:
 
 ```{r}
 # Load the dummy dataset
@@ -82,7 +82,7 @@ The dataset consists of three columns:
 
 ### **Fitting Lactation Curve Models and Generating Ensembles**
 
-The core function of **EnsembleLacs** is **LacCurveFit**. This wrapper function integrates multiple supplementary functions that fit 47 lactation curve models. It takes daily milk production and days in milk from **LacData** as input. The following arguments must be provided:
+The core function of **EMOTIONS** is **LacCurveFit**. This wrapper function integrates multiple supplementary functions that fit 47 lactation curve models. It takes daily milk production and days in milk from **LacData** as input. The following arguments must be provided:
 
 - **data:** Data frame containing daily milking records
 - **ID:** Column name containing unique individual IDs
@@ -154,7 +154,7 @@ ModelRankRange(out.ensemble, metric = "AIC_rank")
 
 ### **Plotting Actual vs. Predicted Daily Milk Yield**
 
-Another visualization option provided by EnsembleLacs is the **PlotWeightLac** function. This function plots the actual daily milk daily production and the predicted values obtained by the ensemble model.The arguments that must be provided to this function are:
+Another visualization option provided by EMOTIONS is the **PlotWeightLac** function. This function plots the actual daily milk daily production and the predicted values obtained by the ensemble model.The arguments that must be provided to this function are:
   
   - *data:* The list generated by the LacCurveFit with the predicted daily milking records
 - *ID:* The ID of the individual that will have the daily milking records plotted
@@ -175,11 +175,11 @@ PlotWeightLac(
 
 The function LacCurveFit allows the customization of the models to be included in the ensemble as well as the parameters of the models.
 
-The EnsembleLacs package has a dataset with the list of models, and its respective acronyms, available in the package. This dataset can be accessed using the following command.
+The EMOTIONS package has a dataset with the list of models, and its respective acronyms, available in the package. This dataset can be accessed using the following command.
 
 ```{r}
-data("models_EnsembleLacs")
-head(models_EnsembleLacs)
+data("models_EMOTIONS")
+head(models_EMOTIONS)
 ```
 
 Users can select specific models to include in the ensemble. For example, the following models will be used to generate the ensemble: `wil`, `wilk`, `wilycsml`, `DiG`, `DiGpw`, `legpol3`, `legpol4`, `legpolWil`, `cubsplin3`, `cubsplin4`, `cubsplin5`, `cubsplindef`, `wilminkPop`, and `qntReg`.
