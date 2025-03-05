@@ -21,7 +21,7 @@ The **EMOTIONS** package provides a set of tools for fitting 47 different lactat
 
 ## **Installing the Package**
 
-Use the following code to install **EnsembleLacs**:
+Use the following code to install **EMOTIONS**:
 
 ```{r, eval=FALSE}
 devtools::install_github("https://github.com/pablobio/EMOTIONS")
@@ -34,7 +34,7 @@ devtools::install_github("https://github.com/pablobio/EMOTIONS")
 ```{r}
 library(EMOTIONS)
 ```
-The vignette with the tutorial for the use of the main functions from EnsembleLacs is available here: https://rpubs.com/pablo_bio/EMOTIONS_vignette
+The vignette with the tutorial for the use of the main functions from EMOTIONS is available here: https://rpubs.com/pablo_bio/EMOTIONS_vignette
 
 ## Authors
 
