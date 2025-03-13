@@ -273,13 +273,13 @@ ModelsLac<-function(data,ID_col,ID,trait,dim, alpha,models,param_list=NULL, sile
 
     weight.AIC <- model.metrics$AIC_weight[model.metrics$Model == model_name]
 
-    if(weight.AIC<0.01){
+    if(weight.AIC<0.01 | is.na(weight.AIC)){
       weight.AIC<-0
     }
 
     weight.BIC <- model.metrics$BIC_weight[model.metrics$Model == model_name]
 
-    if(weight.BIC<0.01){
+    if(weight.BIC<0.01 | is.na(weight.BIC)){
       weight.BIC<-0
     }
 
