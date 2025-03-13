@@ -286,32 +286,32 @@ ModelsLac<-function(data,ID_col,ID,trait,dim, alpha,models,param_list=NULL, sile
 
     rmspe_weight <- model.metrics$RMSPE_weight[model.metrics$Model == model_name]
 
-    if(rmspe_weight<0.01){
+    if(rmspe_weight<0.01 | is.na(rmspe_weight)){
       rmspe_weight<-0
     }
 
     mae_weight <- model.metrics$MAE_weight[model.metrics$Model == model_name]
 
-    if(mae_weight<0.01){
+    if(mae_weight<0.01 | is.na(mae_weight)){
       mae_weight<-0
     }
 
     bma_weight <- model.metrics$BMA_weight[model.metrics$Model == model_name]
 
-    if(bma_weight<0.01){
+    if(bma_weight<0.01 | is.na(bma_weight)){
       bma_weight<-0
     }
 
     var_weight<- model.metrics$Var_weight[model.metrics$Model == model_name]
 
-    if(var_weight<0.01){
+    if(var_weight<0.01 | is.na(var_weight)){
       var_weight<-0
     }
 
 
     CosSquared_weight<-model.metrics$CosSquared_weight[model.metrics$Model == model_name]
 
-    if(CosSquared_weight<0.01){
+    if(CosSquared_weight<0.01 | is.na(CosSquared_weight)){
       CosSquared_weight<-0
     }
 

@@ -148,7 +148,7 @@ Model ranking across individuals can be visualized using **RidgeModels** and **M
 RidgeModels(out.ensemble, metric = "AIC_rank")
 ```
 
-```{r, fig.width=7, fig.height=9}
+```{r, fig.width=9, fig.height=9}
 ModelRankRange(out.ensemble, metric = "AIC_rank")
 ```
 
