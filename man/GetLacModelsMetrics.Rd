@@ -19,3 +19,4 @@ A data frame containing the AIC, BIC, RMSPE and MAE for each fitted model for th
 \description{
 Estimate the Akaike information criterion (AIC), Bayeasian information criterion (BIC), root mean square percentage error (RMSPE) and mean squared error (MAE) for the fitted models
 }
+\keyword{internal}

@@ -5,6 +5,7 @@
 #' @param trait The name of the column containing daily milking records
 #' @importFrom quantreg AIC.rq
 #' @return A data frame containing the AIC, BIC, RMSPE and MAE for each fitted model for the individual
+#' @keywords internal
 GetLacModelsMetrics<-function(converged_models, x, trait){
 
   metrics_list <- lapply(names(converged_models), function(model_name) {

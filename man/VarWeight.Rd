@@ -2,18 +2,19 @@
 % Please edit documentation in R/VarWeight.R
 \name{VarWeight}
 \alias{VarWeight}
-\title{Estimate normalized model`s weights based on the variance of the predictions}
+\title{Estimate normalized model weights based on the variance of the predictions}
 \usage{
 VarWeight(converged_models, x)
 }
 \arguments{
 \item{converged_models}{A list containing the fitted models for the individual}
 
-\item{x}{data frame containing the daily milking records for the individual}
+\item{x}{A data frame containing the daily milking records for the individual}
 }
 \value{
-A vector containing the model normalized weight
+A vector containing the normalized weights for each model
 }
 \description{
-Estimate normalized model`s weights based on the variance of the predictions
+This function estimates normalized model weights by evaluating the variance of each model's predictions.
 }
+\keyword{internal}
